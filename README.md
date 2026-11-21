@@ -1,318 +1,438 @@
-# DevScope — GitHub Developer Profile Analytics
+# DevScope
+### GitHub Developer Profile Analytics Platform
 
-DevScope is a Flask web application for collecting, organizing, exploring, and comparing **public GitHub developer profiles**. It combines a small ETL workflow, relational data storage, interactive analytics, profile search, exports, and experimental machine-learning-assisted job matching.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask"/>
+  <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="Pandas"/>
+  <img src="https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white" alt="NumPy"/>
+  <img src="https://img.shields.io/badge/Scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" alt="Scikit-learn"/>
+  <img src="https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white" alt="Plotly"/>
+</p>
 
-The project was developed as an academic internship/PFE application. This repository contains the application source code and technical documentation; local databases, credentials, virtual environments, and generated personal report material are intentionally excluded.
+<p align="center">
+  <strong>Collect. Process. Analyze. Discover.</strong>
+</p>
 
-## Contents
+---
 
-- [What DevScope does](#what-devscope-does)
-- [Main features](#main-features)
-- [Technology stack](#technology-stack)
-- [Architecture](#architecture)
-- [Repository structure](#repository-structure)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Run the application](#run-the-application)
-- [How to use it](#how-to-use-it)
-- [Machine-learning approach and limitations](#machine-learning-approach-and-limitations)
-- [Tests](#tests)
-- [Data, privacy, and security](#data-privacy-and-security)
-- [Known limitations](#known-limitations)
-- [Future improvements](#future-improvements)
-- [License](#license)
+## Overview
 
-## What DevScope does
+**DevScope** is a Flask-based web application designed to collect, organize, explore, and compare public GitHub developer profiles.
 
-The application retrieves public developer information from the GitHub REST API, transforms selected fields, stores the results in a SQL database, and presents them through a web dashboard.
+The application combines an ETL workflow, relational database management, interactive analytics, profile search, data exports, and experimental machine-learning-assisted job matching.
 
-It is intended as a technical exploration of a complete data-oriented application workflow:
+It transforms publicly available GitHub information into structured data and analytical insights through an integrated web interface.
 
-1. Collect public profile and repository information.
-2. Clean and transform the collected data.
-3. Store profiles and detected technologies in a relational database.
-4. Explore profiles with search, filters, and analytics.
-5. Compare profiles and experiment with job-to-profile matching.
-6. Export selected information for further analysis.
+Developed as an academic project, DevScope brings together practical concepts from **Data Engineering, Data Analysis, and Machine Learning**.
 
-## Main features
+## Features
 
-### 1. Authentication and user workspaces
+### 01. Authentication & User Management
+
 - User registration, login, and logout.
-- Passwords stored as password hashes (not plaintext).
-- User-specific profile collections, favorites, and search history.
-- Access checks for profiles associated with a user's workspace.
+- Secure password hashing.
+- User-specific profile collections and favorites.
+- Search history and profile operation tracking.
+- Access control for profiles associated with each user's workspace.
 
-### 2. GitHub profile collection
-- Search GitHub users by query.
-- Retrieve public profile details and public repositories.
-- Collect fields such as username, display name, bio, location, followers, public repository count, and profile URL.
-- Derive a list of technologies from repository language metadata.
-- Optionally use a GitHub personal access token to increase API rate limits.
+### 02. GitHub Data Collection
 
-### 3. ETL pipeline
-- **Extract:** search GitHub and retrieve public user/repository data.
-- **Transform:** normalize fields, handle missing values, remove duplicate profiles, derive activity and technology information.
-- **Load:** create or update developer records and link collected profiles to the requesting user.
-- Record ETL runs, processing counts, statuses, and logs.
+Collect public developer information using the GitHub REST API.
 
-### 4. Dashboard and analytics
-- KPI cards for collected profiles, technologies, favorites, and data completeness.
-- Interactive charts for technology distribution, activity, platform distribution, locations, profile growth, and other profile indicators.
+The application retrieves information such as:
+
+- GitHub username and display name.
+- Biography and location.
+- Profile URL and avatar.
+- Followers and public repository count.
+- Public repository information.
+- Repository language metadata.
+- Available contribution and activity information.
+
+A GitHub Personal Access Token can optionally be configured to benefit from higher API rate limits.
+
+### 03. ETL Pipeline
+
+DevScope implements an Extract, Transform, Load workflow to process GitHub developer data.
+
+| Stage | Operations |
+|---|---|
+| **Extract** | Search GitHub users and retrieve public profile and repository information. |
+| **Transform** | Normalize fields, handle missing values, remove duplicate profiles, and derive technology and activity indicators. |
+| **Load** | Create or update developer records and associate collected profiles with the requesting user. |
+
+The pipeline also records execution information, including processing counts, statuses, and logs.
+
+### 04. Interactive Dashboard & Analytics
+
+The dashboard provides an overview of collected developer data through:
+
+- Key Performance Indicators (KPIs).
+- Collected profile statistics.
+- Technology distribution.
+- Developer activity indicators.
+- Location and platform information.
+- Profile growth and other analytical indicators.
 - Recent collection and activity summaries.
 
-### 5. Search and profile management
-- Search by username, display name, or location.
-- Filter by technology, platform, activity, date range, repository count, and follower count.
+Interactive visualizations help users explore and interpret the collected information.
+
+### 05. Developer Search & Profile Management
+
+- Search profiles by username, display name, or location.
+- Filter by technology, platform, activity, date range, repository count, and followers.
 - Sort and paginate search results.
-- Open profile details and inspect detected technologies and available repository information.
-- Save favorites, update or remove profiles from a workspace, and review profile operations.
+- View developer details and detected technologies.
+- Save profiles to Favorites.
+- Update or remove profiles from a personal workspace.
+- Review profile operations.
 
-### 6. Comparison and job matching
-- Compare selected developer profiles.
-- Enter a job title, required technologies, required skills, and an experience level.
-- Produce a ranked list using skill overlap, an experimental model score, and an experience-related score.
+### 06. Profile Comparison & Job Matching
 
-### 7. Exports
-- Export dashboard/profile data as CSV.
-- Export tabular data as Excel (`.xlsx`).
-- Generate PDF reports for dashboard or individual profile information.
+The application provides profile comparison and an experimental job-matching module.
 
-### 8. Administration
-- Read-only administration pages for user, profile, ETL, and technology statistics.
-- Admin access is controlled by the `is_admin` field in the database. New registrations are **not** automatically granted admin privileges.
+Users can specify:
+- A job title.
+- Required technologies.
+- Required skills.
+- An experience level.
 
-## Technology stack
+The matching process combines:
+- Required-skill overlap.
+- An experimental machine-learning model score.
+- An experience-related score.
 
-| Area | Technologies |
+The results provide a ranked list of developer profiles based on these indicators.
+
+### 07. Data Export
+
+Export dashboard and developer information in different formats:
+
+| Format | Purpose |
 |---|---|
-| Backend | Python, Flask, Flask-SQLAlchemy, SQLAlchemy |
-| Frontend | HTML, CSS, JavaScript, Jinja templates |
-| Data processing | Pandas, NumPy |
-| Data collection | GitHub REST API, Requests, BeautifulSoup |
-| Database | SQLite by default; MySQL can be configured through PyMySQL |
-| Visualization | Plotly, Matplotlib |
-| Machine learning | scikit-learn, TF-IDF, Logistic Regression, KNN, Random Forest |
-| Exports | CSV, OpenPyXL, ReportLab |
-| Model persistence | Joblib |
+| CSV | Export tabular information. |
+| Excel (.xlsx) | Export structured data for further analysis. |
+| PDF | Generate dashboard and individual developer reports. |
 
-## Architecture
+### 08. Administration
+
+A read-only administration area provides monitoring information about:
+
+- Registered users.
+- Collected developer profiles.
+- Technologies.
+- ETL executions and logs.
+- General application statistics.
+
+Administrative access is controlled through the user's `is_admin` database field.
+
+---
+
+## Technology Stack
+
+| Category | Technologies |
+|---|---|
+| **Programming Language** | Python |
+| **Backend Framework** | Flask |
+| **ORM & Database Integration** | Flask-SQLAlchemy, SQLAlchemy |
+| **Frontend** | HTML, CSS, JavaScript, Jinja |
+| **Data Processing** | Pandas, NumPy |
+| **Data Collection** | GitHub REST API, Requests, BeautifulSoup |
+| **Database** | SQLite, MySQL |
+| **Data Visualization** | Plotly, Matplotlib |
+| **Machine Learning** | Scikit-learn |
+| **ML Techniques** | TF-IDF, Logistic Regression, K-Nearest Neighbors, Random Forest |
+| **Data Export** | OpenPyXL, ReportLab |
+| **Model Persistence** | Joblib |
+
+---
+
+## Application Architecture
+
+DevScope follows a modular architecture that separates application routes, business logic, data processing, and persistence.
 
 ```mermaid
 flowchart TD
-    A["Browser"] --> B["Flask routes and Jinja templates"]
-    B --> C["Application services"]
-    C --> D["ETL collector"]
+    A["User / Browser"] --> B["Flask Routes & Jinja Templates"]
+    B --> C["Application Services"]
+
+    C --> D["GitHub ETL Pipeline"]
     D --> E["GitHub REST API"]
-    D --> F["Public GitHub profile page"]
+    D --> F["Public GitHub Profile Pages"]
+
     C --> G["SQLAlchemy ORM"]
-    G --> H[("SQL database")]
-    C --> I["Analytics and export services"]
-    C --> J["ML feature engineering and matching"]
+    G --> H[("SQLite / MySQL Database")]
+
+    C --> I["Analytics Services"]
+    C --> J["Export Services"]
+    C --> K["ML Feature Engineering & Matching"]
+
     I --> B
     J --> B
+    K --> B
 ```
 
-The backend is organized around Flask blueprints, data models, and service modules. The ETL collector is separated from the pipeline orchestration, while analytics, exports, profile management, and ML functionality live in dedicated packages.
+### Main Application Modules
 
-## Repository structure
+| Module | Responsibility |
+|---|---|
+| `etl/` | GitHub data collection and ETL pipeline orchestration. |
+| `ml/` | Feature engineering, model training, prediction, and profile matching. |
+| `models/` | Database models and relationships. |
+| `routes/` | Authentication, application pages, API endpoints, and administration. |
+| `services/` | Analytics, search, exports, authentication, and profile management. |
+| `templates/` | HTML pages rendered with Jinja. |
+| `static/` | CSS, JavaScript, and interface icons. |
+
+---
+
+## Machine Learning Approach
+
+The machine-learning component explores developer-profile classification and job matching.
+
+### Classification Models
+
+The training module experiments with three classifiers:
+
+- Logistic Regression
+- K-Nearest Neighbors (KNN)
+- Random Forest
+
+### Feature Engineering
+
+The feature pipeline combines numerical profile indicators, including:
+
+- Followers.
+- Public repositories.
+- Contributions.
+- Account age.
+- Recent activity.
+- Detected technology count.
+
+It also uses TF-IDF features derived from repository languages and detected skills.
+
+### Important Methodological Limitation
+
+The current training process generates its `high_quality` target using a percentile threshold over the application's own weighted `global_score`.
+
+Since this score is itself calculated from profile indicators used by the model, the ML component is an experimental approximation of an internal scoring rule.
+
+It is **not trained on independently labelled recruitment outcomes or verified developer-quality data**.
+
+Therefore, its metrics and matching scores should be interpreted as exploratory decision-support indicators, not as proof of recruitment accuracy or an automated hiring decision.
+
+---
+
+## Project Structure
 
 ```text
 DevScope/
+│
 ├── backend/
 │   ├── app/
-│   │   ├── etl/              # GitHub collection and ETL pipeline
-│   │   ├── ml/               # Feature engineering, training, prediction, matching
-│   │   ├── models/           # SQLAlchemy models
-│   │   ├── routes/           # Authentication, pages, API, administration
-│   │   ├── services/         # Analytics, exports, search, profile services
-│   │   ├── static/           # CSS, JavaScript, icons
-│   │   └── templates/        # Jinja HTML templates
-│   ├── docs/                 # Feature and GitHub collection notes
-│   ├── tests/                # Functional integration tests
-│   ├── .env.example          # Safe configuration template
+│   │   ├── etl/
+│   │   ├── ml/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   ├── static/
+│   │   └── templates/
+│   │
+│   ├── tests/
+│   ├── .env.example
 │   ├── requirements.txt
 │   └── run.py
-├── docs/
-│   ├── diagrams/             # Mermaid and PlantUML diagrams
-│   ├── Documentation_ML_FR.md
-│   └── Documentation_Technique_DevScope_FR.md
+│
 ├── .gitignore
 └── README.md
 ```
 
-## Additional documentation
+---
 
-- [Technical documentation (French)](docs/Documentation_Technique_DevScope_FR.md)
-- [Machine-learning documentation (French)](docs/Documentation_ML_FR.md)
-- [Architecture and workflow diagrams](docs/diagrams/README.md)
-- [Feature guide (French)](backend/docs/Guide_Fonctionnalites_FR.md)
-- [GitHub live-search notes](backend/Documentation-GitHub-Live-Search.md)
+## Getting Started
 
-## Requirements
+### Requirements
 
-- Python 3.11 is recommended.
+- Python 3.11 (recommended).
 - Git.
-- Internet access for GitHub collection.
-- A GitHub personal access token is optional; unauthenticated requests are subject to lower rate limits.
+- Internet connection for GitHub data collection.
+- GitHub Personal Access Token (optional).
 
-The default database is SQLite, so a separate database server is not required for a local run.
+The default database is SQLite, so a separate database server is not required for local execution.
 
-## Installation
+### 1. Clone the Repository
 
-Open a terminal in the repository and move into the backend directory:
+```bash
+git clone https://github.com/yasmine-salama/DevScope.git
+cd DevScope
+```
+
+### 2. Navigate to the Backend
 
 ```bash
 cd backend
 ```
 
-### Windows (PowerShell)
+### 3. Create a Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+Activate it on Windows:
 
 ```powershell
-py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1
+.venv\Scripts\Activate.ps1
+```
+
+On macOS / Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+### 4. Install Dependencies
+
+```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+```
+
+### 5. Configure Environment Variables
+
+Create a local `.env` file from the provided example.
+
+**Windows (PowerShell):**
+
+```powershell
 Copy-Item .env.example .env
 ```
 
-### macOS / Linux
+**macOS / Linux:**
 
 ```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -r requirements.txt
 cp .env.example .env
 ```
 
-## Configuration
-
-Edit `backend/.env` and set a strong secret key. Generate one with:
-
-```bash
-python -c "import secrets; print(secrets.token_hex(32))"
-```
-
-Example configuration:
+Open `.env` and configure the required settings:
 
 ```dotenv
-SECRET_KEY=replace_with_a_random_64_character_hex_value
+SECRET_KEY=your_generated_secret_key
 DATABASE_URL=sqlite:///devscope.db
 GITHUB_TOKEN=
 SESSION_COOKIE_SECURE=false
 ```
 
-Configuration variables:
+Generate a secure secret key using:
 
-| Variable | Required | Description |
-|---|---:|---|
-| `SECRET_KEY` | Yes | Random secret of at least 32 characters used to sign Flask sessions. The app rejects the placeholder value. |
-| `DATABASE_URL` | No | SQLAlchemy database URL. Defaults to SQLite (`sqlite:///devscope.db`). |
-| `GITHUB_TOKEN` | No | GitHub token used for authenticated API requests and higher rate limits. |
-| `SESSION_COOKIE_SECURE` | No | Set to `true` only when the application is served over HTTPS. Keep `false` for local HTTP development. |
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
 
-For MySQL, install/use the included PyMySQL driver and set a SQLAlchemy URL such as:
+| Variable | Description |
+|---|---|
+| `SECRET_KEY` | Required secret used to sign Flask sessions. Must contain at least 32 characters. |
+| `DATABASE_URL` | Database connection URL. Defaults to SQLite. |
+| `GITHUB_TOKEN` | Optional GitHub token for authenticated API requests. |
+| `SESSION_COOKIE_SECURE` | Enable secure session cookies when serving the application over HTTPS. |
+
+For MySQL, configure a SQLAlchemy connection URL:
 
 ```dotenv
 DATABASE_URL=mysql+pymysql://USER:PASSWORD@HOST:3306/DATABASE_NAME
 ```
 
-Do not commit `.env`, real tokens, database files, or passwords. The repository `.gitignore` excludes these local files.
+**Security:** Never commit your `.env` file, GitHub token, passwords, or secret keys.
 
-### Admin account
+### 6. Run the Application
 
-Register a normal account first. To grant that account access to the read-only admin area, update its `is_admin` value in your local database. For the default SQLite setup, run this from the `backend` directory after replacing the email:
-
-```bash
-python -c "import sqlite3; c=sqlite3.connect('instance/devscope.db'); c.execute('UPDATE users SET is_admin=1 WHERE email=?', ('your-email@example.com',)); c.commit(); c.close()"
-```
-
-The application intentionally does not grant admin privileges merely because someone enters a configured email address during public registration.
-
-## Run the application
-
-From the `backend` directory, with the virtual environment activated:
+From inside the `backend/` directory:
 
 ```bash
 python run.py
 ```
 
-Then open:
+Open the application in your browser:
 
 ```text
 http://127.0.0.1:5000
 ```
 
-The application initializes its database schema on startup. The built-in Flask server is for local development only; it is not a production deployment server.
+The database schema is initialized when the application starts.
 
-## How to use it
+The built-in Flask server is intended for local development, not production deployment.
 
-1. Open the application and create an account.
-2. Sign in and open the dashboard.
-3. Use the GitHub search/collection controls to find public developer profiles.
-4. Run an ETL collection with a query and a reasonable profile limit.
-5. Explore the collected profiles through Search and Developer Details.
-6. Save profiles to Favorites or compare selected profiles.
-7. Open the ML area to train the experimental model or try job matching.
-8. Export dashboard or profile information as CSV, Excel, or PDF.
-9. Review collection runs and logs in ETL History.
+---
 
-GitHub collection depends on API availability and rate limits. A token is optional for local exploration but recommended for repeated collection.
+## How to Use DevScope
 
-## Machine-learning approach and limitations
+1. Open the application and create a user account.
+2. Sign in and access the dashboard.
+3. Use GitHub search and collection controls to find public developer profiles.
+4. Run an ETL collection with a search query and a suitable profile limit.
+5. Explore collected profiles through Search and Developer Details.
+6. Save interesting profiles to Favorites.
+7. Compare selected developer profiles.
+8. Explore the experimental ML model and job-matching functionality.
+9. Export dashboard or profile information in CSV, Excel, or PDF format.
+10. Review ETL execution history and logs.
 
-The ML module currently experiments with three classifiers:
+GitHub collection depends on network availability and API rate limits. A token is optional, but recommended for repeated collection.
 
-- Logistic Regression
-- K-Nearest Neighbors
-- Random Forest
-
-The feature pipeline combines numerical profile indicators (followers, repositories, contributions, account age, recent activity, and detected technology count) with TF-IDF features derived from repository languages/skills.
-
-**Important methodological note:** the current training code creates its `high_quality` target from a percentile threshold over the application's own weighted `global_score`. That score is itself calculated from profile indicators used by the model. Therefore, the ML task is a heuristic experiment that approximates the application's scoring rule; it is **not** trained on independently labelled hiring outcomes or verified developer quality. Its reported metrics should not be interpreted as proof of recruitment accuracy.
-
-The job-matching module combines required-skill overlap, the saved model's score (when a model exists), and an experience-related component. Results are exploratory decision support only and should not be used as an automated hiring decision.
+---
 
 ## Tests
 
-From the `backend` directory:
+Functional tests are available in the backend directory.
+
+Run them using:
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-The functional tests cover key flows such as user data isolation, ETL behavior with mocked GitHub responses, ML pages, and export endpoints. They do not replace a full security review or production acceptance test.
+The tests cover key application flows, including user data isolation, ETL behavior with mocked GitHub responses, ML pages, and export endpoints.
 
-## Data, privacy, and security
+They do not replace a complete security review or production acceptance test.
 
-- The collector is designed to retrieve public GitHub profile and repository information.
-- Public profile information can still be personal data. Collect only what is needed and respect GitHub's terms, API policies, and applicable privacy requirements.
-- A GitHub token is a credential: keep it in `backend/.env` or a secure environment-variable store, never in source code.
-- Passwords are stored using Werkzeug password hashing.
-- User-specific profile access is enforced in the application services and routes.
-- The repository excludes local databases, account records, generated model files, virtual environments, and local configuration.
+---
 
-Before exposing an instance to the internet, add and verify production controls such as CSRF protection for state-changing requests, login rate limiting, email verification or controlled account creation, HTTPS, secure secret management, database backups, and a production WSGI server. The current project is an academic/demo application, not a hardened multi-tenant production service.
+## Known Limitations
 
-## Known limitations
+- GitHub contribution information is retrieved from public profile pages and may become unavailable if GitHub changes its page structure.
+- Detected technologies are inferred from language metadata in a limited set of public repositories; they are not a complete or verified skills inventory.
+- GitHub API rate limits and network availability can interrupt data collection.
+- ML scores depend on the available dataset and the heuristic target-generation approach.
+- The repository does not include a pre-populated database or trained model. These are generated locally through application use.
+- The application is an academic/demo project and is not hardened for production multi-tenant deployment.
 
-- The contribution count is read from the public GitHub profile page and may be unavailable if GitHub changes its HTML.
-- Detected technologies are inferred from language metadata in a limited set of public repositories; they do not represent a complete or verified skills inventory.
-- GitHub API rate limits and network availability can interrupt collection.
-- ML scores depend on the available dataset and the heuristic target described above.
-- The repository does not include a pre-populated database or trained model. Both are generated locally through application use.
+---
 
-## Future improvements
+## Future Improvements
 
-- Add automated unit and integration test coverage for edge cases and security-sensitive flows.
+- Expand unit and integration test coverage.
 - Introduce CSRF protection and login rate limiting.
-- Improve GitHub API retry/backoff and collection observability.
-- Add data-retention controls and clearer provenance for each derived skill.
-- Rework ML evaluation around independent, reviewed labels and a larger representative dataset.
-- Improve deployment configuration and add a documented production WSGI setup.
+- Improve GitHub API retry and backoff mechanisms.
+- Add data-retention controls and clearer data provenance.
+- Improve ML evaluation using independent and reviewed labels.
+- Enhance deployment configuration and production WSGI support.
 
-## License
+---
 
-No open-source license has been selected for this repository yet. Add a `LICENSE` file before inviting others to reuse, modify, or redistribute the code.
+## Author
+
+**Yasmine Salama**
+
+Data Science Student | Data Engineering
+
+[GitHub Profile](https://github.com/yasmine-salama)
+
+[DevScope Repository](https://github.com/yasmine-salama/DevScope)
+
+---
+
+<p align="center">
+  <strong>DevScope</strong><br/>
+  <sub>Collect. Process. Analyze. Discover.</sub>
+</p>
