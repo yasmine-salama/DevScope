@@ -1,0 +1,79 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Administration · ETL · DevScope{% endblock %}
+{% block header %}Administration · ETL{% endblock %}
+
+{% block content %}
+<div class="grid gap-16">
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Exécutions ETL</div>
+        <div class="card-sub">Exécutions récentes avec statut et compteurs.</div>
+      </div>
+      <div class="row gap-8">
+        <a class="btn btn-ghost" href="{{ url_for('admin.dashboard') }}">Retour</a>
+        <a class="btn btn-ghost" href="{{ url_for('pages.etl_history') }}">Ouvrir l'historique ETL</a>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Source</th>
+            <th>Statut</th>
+            <th>Extraits</th>
+            <th>Transformés</th>
+            <th>Chargés</th>
+            <th>Erreurs</th>
+            <th>Démarré</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in runs %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.source }}</td>
+              <td>{{ r.status }}</td>
+              <td>{{ r.extracted_count }}</td>
+              <td>{{ r.transformed_count }}</td>
+              <td>{{ r.loaded_count }}</td>
+              <td>{{ r.error_count }}</td>
+              <td>{{ r.started_at }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="8" class="muted">Aucune exécution ETL.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Derniers journaux ETL</div>
+        <div class="card-sub">Dernières {{ logs|length }} lignes de journal (lecture seule).</div>
+      </div>
+    </div>
+    <div class="logs">
+      {% for l in logs %}
+        <div class="log-line">
+          <div><span class="badge">{{ l.level }}</span> <span class="muted">{{ l.message }}</span></div>
+          <div class="muted small">{{ l.created_at }}</div>
+        </div>
+      {% else %}
+        <div class="empty">Aucun journal.</div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__PAGE__ = "admin_etl";
+</script>
+{% endblock %}
+

@@ -1,0 +1,92 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Développeur · DevScope{% endblock %}
+{% block header %}Détails du développeur{% endblock %}
+
+{% block content %}
+<div class="page-layout">
+  <section class="page-section">
+    <div class="card">
+      <div class="card-head developer-head">
+        <div class="profile-head">
+          <div class="profile-avatar" id="devAvatar"></div>
+          <div>
+            <div class="card-title" id="devName">Développeur</div>
+            <div class="card-sub" id="devMeta">-</div>
+            <div class="profile-bio" id="devBio"></div>
+          </div>
+        </div>
+        <div class="developer-actions">
+          <button class="btn btn-ghost" id="favToggle" type="button">Enregistrer</button>
+          <a class="btn btn-ghost" href="/api/exports/developer/{{ developer_id }}?format=csv">CSV</a>
+          <a class="btn btn-primary" href="/api/exports/developer/{{ developer_id }}?format=pdf">PDF</a>
+          <a class="btn btn-ghost" id="devProfileLink" href="#" target="_blank" rel="noreferrer">Ouvrir le profil</a>
+        </div>
+      </div>
+      <div class="stats-row" id="devStats"></div>
+    </div>
+  </section>
+
+  <section class="page-section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Compétences et activité</div>
+        <div class="section-sub">Signaux technologiques détectés à partir des données GitHub stockées.</div>
+      </div>
+    </div>
+    <div class="developer-analytics">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Répartition technologique</div>
+            <div class="card-sub">Détecté à partir des dépôts récents.</div>
+          </div>
+        </div>
+        <div class="chart" id="devChartBar"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Répartition des compétences</div>
+            <div class="card-sub">Vue rapide de la répartition des compétences.</div>
+          </div>
+        </div>
+        <div class="chart" id="devChartPie"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section">
+    <div class="developer-details-grid">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Compétences détectées</div>
+            <div class="card-sub">Technologies principales et scores.</div>
+          </div>
+        </div>
+        <div class="skills" id="devSkills"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Aperçu des dépôts</div>
+            <div class="card-sub">Principaux dépôts récents enregistrés pendant l'ETL.</div>
+          </div>
+        </div>
+        <div class="repos" id="devRepos"></div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__PAGE__ = "developer";
+  window.__DEVELOPER_ID__ = {{ developer_id }};
+</script>
+{% endblock %}
+

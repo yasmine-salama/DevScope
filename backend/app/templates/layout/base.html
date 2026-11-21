@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="fr" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f0f2f4" />
+    <title>{% block title %}DevScope{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">D</div>
+          <div class="brand-text">
+            <div class="brand-name">DevScope</div>
+            <div class="brand-sub">ML intelligence workspace</div>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <div class="nav-section">
+            <div class="nav-section-head">Workspace</div>
+            <a class="nav-link {% if request.path.startswith('/dashboard') %}active{% endif %}" href="{{ url_for('pages.dashboard') }}">
+              <svg class="icon" aria-hidden="true"><use href="{{ url_for('static', filename='img/icons.svg') }}#icon-dashboard"></use></svg>
+              <span class="nav-label">Tableau de bord</span>
+            </a>
+            <a class="nav-link {% if request.path.startswith('/search') %}active{% endif %}" href="{{ url_for('pages.search') }}">
+              <svg class="icon" aria-hidden="true"><use href="{{ url_for('static', filename='img/icons.svg') }}#icon-search"></use></svg>
+              <span class="nav-label">Recherche</span>
+            </a>
+            <a class="nav-link {% if request.path.startswith('/favorites') %}active{% endif %}" href="{{ url_for('pages.favorites') }}">
+              <svg class="icon" aria-hidden="true"><use href="{{ url_for('static', filename='img/icons.svg') }}#icon-favorites"></use></svg>
+              <span class="nav-label">Favoris</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <div class="nav-section-head">Collecte</div>
+            <a class="nav-link {% if request.path.startswith('/etl') %}active{% endif %}" href="{{ url_for('pages.etl_history') }}">
+              <svg class="icon" aria-hidden="true"><use href="{{ url_for('static', filename='img/icons.svg') }}#icon-etl"></use></svg>
+              <span class="nav-label">Historique ETL</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <div class="nav-section-head">Modèles</div>
+            <a class="nav-link {% if request.path.startswith('/ml/match') %}active{% endif %}" href="{{ url_for('ml.match') }}">
+              <svg class="icon" aria-hidden="true"><use href="{{ url_for('static', filename='img/icons.svg') }}#icon-match"></use></svg>
+              <span class="nav-label">Matching d'offres</span>
+            </a>
+            <a class="nav-link {% if request.path.startswith('/ml/compare') %}active{% endif %}" href="{{ url_for('ml.compare') }}">
+              <svg class="icon" aria-hidden="true"><use href="{{ url_for('static', filename='img/icons.svg') }}#icon-compare"></use></svg>
+              <span class="nav-label">Comparaison profils</span>
+            </a>
+          </div>
+
+          {% if is_admin %}
+            <div class="nav-section">
+              <div class="nav-section-head">Admin</div>
+              <a class="nav-link {% if request.path.startswith('/admin') %}active{% endif %}" href="{{ url_for('admin.dashboard') }}">
+                <svg class="icon" aria-hidden="true"><use href="{{ url_for('static', filename='img/icons.svg') }}#icon-admin"></use></svg>
+                <span class="nav-label">Administration</span>
+              </a>
+            </div>
+          {% endif %}
+        </nav>
+
+        <div class="sidebar-footer">
+          {% if is_logged_in and current_user %}
+            <div class="user-chip">
+              <div class="user-dot"></div>
+              <div class="user-email">{{ current_user.email }}</div>
+            </div>
+            <a class="btn btn-ghost btn-full" href="{{ url_for('auth.logout') }}">Déconnexion</a>
+          {% endif %}
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="btn btn-ghost btn-icon" id="sidebarToggle" type="button" aria-label="Afficher ou masquer le menu">
+              <svg class="icon" aria-hidden="true"><use href="{{ url_for('static', filename='img/icons.svg') }}#icon-menu"></use></svg>
+            </button>
+            <div class="page-title">{% block header %}{% endblock %}</div>
+          </div>
+          <div class="topbar-right">
+            {% if is_logged_in %}
+              <form class="global-search" id="globalSearchForm">
+                <input class="input input-compact" id="globalSearchInput" placeholder="Rechercher profils, skills..." />
+                <button class="btn btn-ghost" type="submit">Chercher</button>
+              </form>
+            {% endif %}
+            <div class="topbar-actions">
+              {% if is_logged_in and current_user %}
+                <div class="profile-menu-wrapper">
+                  <button class="btn btn-ghost btn-icon" id="profileMenuBtn" aria-haspopup="true" aria-expanded="false" aria-label="Menu utilisateur">
+                    <svg class="icon" aria-hidden="true"><use href="{{ url_for('static', filename='img/icons.svg') }}#icon-user"></use></svg>
+                  </button>
+                  <div class="profile-menu" id="profileMenu" aria-hidden="true">
+                    <div class="profile-menu-item"><a href="{{ url_for('pages.profile') }}">Profil</a></div>
+                    <div class="profile-menu-item"><button id="profileThemeToggle" class="menu-action">Changer le thème</button></div>
+                    <div class="profile-menu-item"><a href="{{ url_for('auth.logout') }}">Déconnexion</a></div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </header>
+
+        <section class="content">
+          {% block content %}{% endblock %}
+        </section>
+      </main>
+    </div>
+
+    <div id="toastRoot" class="toast-root"></div>
+    <script>
+      window.__FLASHES__ = {{ get_flashed_messages(with_categories=true) | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
+

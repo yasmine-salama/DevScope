@@ -1,0 +1,54 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Favoris · DevScope{% endblock %}
+{% block header %}Favoris{% endblock %}
+
+{% block content %}
+<div class="page-layout">
+  <section class="page-section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Profils sauvegardés</div>
+        <div class="section-sub">Développeurs sauvegardés depuis les pages de recherche et de profil.</div>
+      </div>
+      <a class="btn btn-ghost" href="{{ url_for('pages.search') }}">Trouver des profils</a>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Aperçu des favoris</div>
+          <div class="card-sub">Statistiques rapides sur les profils sauvegardés.</div>
+        </div>
+      </div>
+      <div class="favorites-overview">
+        <div class="kpi">
+          <div class="kpi-label">Total</div>
+          <div class="kpi-value" id="favTotal">-</div>
+          <div class="kpi-sub">Profils sauvegardés</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Followers moyens</div>
+          <div class="kpi-value" id="favAvgFollowers">-</div>
+          <div class="kpi-sub">Par profil sauvegardé</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Dépôts moyens</div>
+          <div class="kpi-value" id="favAvgRepos">-</div>
+          <div class="kpi-sub">Par profil sauvegardé</div>
+        </div>
+        <div class="favorites-action"><button class="btn btn-ghost" id="compareFavoritesBtn">Comparer les favoris</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="results" id="favoritesGrid"></div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__PAGE__ = "favorites";
+</script>
+{% endblock %}
+

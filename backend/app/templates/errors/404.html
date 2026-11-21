@@ -1,0 +1,17 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Introuvable · DevScope{% endblock %}
+{% block header %}Page introuvable{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-head">
+    <div>
+      <div class="card-title">404 — Page introuvable</div>
+      <div class="card-sub">La page demandée n'existe pas.</div>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('pages.dashboard') }}">Retour au tableau de bord</a>
+  </div>
+</div>
+{% endblock %}
+

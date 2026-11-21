@@ -1,0 +1,52 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Historique ETL · DevScope{% endblock %}
+{% block header %}Historique ETL{% endblock %}
+
+{% block content %}
+<div class="page-layout">
+  <section class="page-section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Exécutions ETL</div>
+        <div class="section-sub">Suivre les exécutions et les enregistrements traités.</div>
+      </div>
+      <a class="btn btn-ghost" href="{{ url_for('pages.dashboard') }}">Tableau de bord</a>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Exécutions récentes</div>
+          <div class="card-sub">Dernières exécutions ETL.</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table" id="etlTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Source</th>
+              <th>Statut</th>
+              <th>Extrait</th>
+              <th>Transformé</th>
+              <th>Chargé</th>
+              <th>Durée</th>
+              <th>Doublons</th>
+              <th>Erreurs</th>
+              <th>Démarré</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__PAGE__ = "etl_history";
+</script>
+{% endblock %}
+

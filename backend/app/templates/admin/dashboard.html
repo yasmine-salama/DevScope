@@ -1,0 +1,159 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Administration · DevScope{% endblock %}
+{% block header %}Administration{% endblock %}
+
+{% block content %}
+<div class="grid gap-16">
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Administration</div>
+        <div class="card-sub">Gestion des utilisateurs, profils collectés, surveillance ETL et statistiques de base.</div>
+      </div>
+      <div class="row gap-8">
+        <a class="btn btn-ghost" href="{{ url_for('admin.users') }}">Utilisateurs</a>
+        <a class="btn btn-ghost" href="{{ url_for('admin.profiles') }}">Profils</a>
+        <a class="btn btn-ghost" href="{{ url_for('admin.etl') }}">Logs ETL</a>
+        <a class="btn btn-primary" href="{{ url_for('admin.stats') }}">Statistiques</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="kpi-grid">
+    <div class="kpi card">
+      <div class="kpi-label">Utilisateurs</div>
+      <div class="kpi-value">{{ counts.users }}</div>
+      <div class="kpi-sub">Comptes enregistrés</div>
+    </div>
+    <div class="kpi card">
+      <div class="kpi-label">Développeurs</div>
+      <div class="kpi-value">{{ counts.developers }}</div>
+      <div class="kpi-sub">Profils collectés</div>
+    </div>
+    <div class="kpi card">
+      <div class="kpi-label">Exécutions ETL</div>
+      <div class="kpi-value">{{ counts.etl_runs }}</div>
+      <div class="kpi-sub">Historique des exécutions</div>
+    </div>
+    <div class="kpi card">
+      <div class="kpi-label">Journaux</div>
+      <div class="kpi-value">{{ counts.etl_logs }}</div>
+      <div class="kpi-sub">Événements ETL</div>
+    </div>
+  </section>
+
+  <section class="grid cols-2 gap-16">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Utilisateurs récents</div>
+          <div class="card-sub">Derniers comptes enregistrés.</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Admin</th>
+              <th>Créé</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in recent_users %}
+              <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ "oui" if u.is_admin else "non" }}</td>
+                <td>{{ u.created_at }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="muted">Aucun utilisateur.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Profils récents</div>
+          <div class="card-sub">Derniers profils développeurs mis à jour.</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nom d'utilisateur</th>
+              <th>Plateforme</th>
+              <th>Mis à jour</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in recent_profiles %}
+              <tr>
+                <td>{{ d.id }}</td>
+                <td><a class="link" href="{{ url_for('pages.developer_details', developer_id=d.id) }}">{{ d.username }}</a></td>
+                <td>{{ d.platform }}</td>
+                <td>{{ d.updated_at }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="muted">Aucun profil.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+        <div class="card-head">
+      <div>
+        <div class="card-title">Exécutions ETL récentes</div>
+        <div class="card-sub">Suivre les métriques d'extraction, transformation et chargement.</div>
+      </div>
+      <a class="btn btn-ghost" href="{{ url_for('pages.etl_history') }}">Ouvrir l'historique ETL</a>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Statut</th>
+            <th>Extraits</th>
+            <th>Transformés</th>
+            <th>Chargés</th>
+            <th>Démarré</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in recent_etl %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.status }}</td>
+              <td>{{ r.extracted_count }}</td>
+              <td>{{ r.transformed_count }}</td>
+              <td>{{ r.loaded_count }}</td>
+              <td>{{ r.started_at }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="muted">Aucune exécution ETL.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__PAGE__ = "admin_dashboard";
+</script>
+{% endblock %}
+

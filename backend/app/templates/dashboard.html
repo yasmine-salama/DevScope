@@ -1,0 +1,225 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Tableau de bord - DevScope{% endblock %}
+{% block header %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <section class="dashboard-hero">
+    <div>
+      <div class="hero-kicker">Developer intelligence</div>
+      <h1 class="hero-title">Observer, qualifier et comparer les profils techniques.</h1>
+      <p class="hero-copy">Un cockpit minimal pour suivre la collecte GitHub, lire les signaux d'activité et préparer les analyses ML sans friction visuelle.</p>
+    </div>
+    <div class="hero-actions">
+      <a class="btn btn-ghost" href="{{ url_for('pages.search') }}">Explorer les profils</a>
+      <a class="btn btn-ghost" href="{{ url_for('pages.etl_history') }}">Historique ETL</a>
+    </div>
+  </section>
+
+  <section class="dashboard-overview">
+    <div class="card dashboard-etl-card">
+      <div class="card-head">
+        <div>
+          <div class="eyebrow">Pipeline</div>
+          <div class="card-title">Contrôle ETL</div>
+          <div class="card-sub">Collecte, nettoyage et synchronisation des indicateurs analytiques.</div>
+        </div>
+      </div>
+      <div class="etl-controls">
+        <div class="etl-controls-main">
+          <button class="btn btn-primary" id="runEtlBtn" type="button">Lancer ETL</button>
+          <button class="btn btn-ghost" id="toggleEtlAdvanced" type="button" aria-expanded="false">Paramètres</button>
+          <div class="muted small" id="etlQuerySummary">location:Morocco language:Python - limite 25</div>
+        </div>
+
+        <div class="etl-advanced" id="etlAdvanced" hidden>
+          <label class="field">
+            <span class="label">Requête GitHub</span>
+            <input class="input" id="etlQuery" value="location:Morocco language:Python" />
+          </label>
+          <label class="field">
+            <span class="label">Limite</span>
+            <input class="input" id="etlLimit" type="number" value="25" min="1" max="50" />
+          </label>
+        </div>
+      </div>
+      <div class="muted small etl-last-run" id="etlLastRun"></div>
+      <div class="etl-monitor" id="etlMonitor"></div>
+    </div>
+
+    <div class="kpi-grid dashboard-kpis" id="kpiGrid">
+      <div class="kpi card">
+        <div class="kpi-label">Profils</div>
+        <div class="kpi-value" id="kpiProfiles">-</div>
+        <div class="row gap-8"><div class="kpi-trend" id="kpiProfilesTrend">-</div><div class="kpi-sub">Profils enregistrés</div></div>
+      </div>
+      <div class="kpi card">
+        <div class="kpi-label">Actifs (30j)</div>
+        <div class="kpi-value" id="kpiActive">-</div>
+        <div class="row gap-8"><div class="kpi-trend" id="kpiActiveTrend">-</div><div class="kpi-sub">Signaux récents</div></div>
+      </div>
+      <div class="kpi card">
+        <div class="kpi-label">Qualité</div>
+        <div class="kpi-value" id="kpiQuality">-</div>
+        <div class="kpi-sub">Couverture localisation + bio</div>
+        <div class="progress">
+          <div class="progress-bar" id="qualityBar"></div>
+        </div>
+      </div>
+      <div class="kpi card">
+        <div class="kpi-label">Favoris</div>
+        <div class="kpi-value" id="kpiFavorites">-</div>
+        <div class="row gap-8"><div class="kpi-trend" id="kpiFavoritesTrend">-</div><div class="kpi-sub">Sélection courte</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Analyses</div>
+        <div class="section-sub">Tendances, volumes, fraîcheur et qualité des données collectées.</div>
+      </div>
+    </div>
+    <div class="dashboard-analytics">
+      <div class="card span-large">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Technologies principales</div>
+            <div class="card-sub">Agrégées depuis les langages des dépôts.</div>
+          </div>
+        </div>
+        <div class="chart" id="chartTopTech"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Répartition par plateforme</div>
+            <div class="card-sub">Sources actuellement stockées.</div>
+          </div>
+        </div>
+        <div class="chart" id="chartPlatform"></div>
+      </div>
+
+      <div class="card span-wide">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Activité dans le temps</div>
+            <div class="card-sub">Basée sur la date du dernier push du dépôt.</div>
+          </div>
+        </div>
+        <div class="chart" id="chartActivity"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Croissance des profils</div>
+            <div class="card-sub">Profils ajoutés ou mis à jour au fil du temps.</div>
+          </div>
+        </div>
+        <div class="chart" id="chartGrowth"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Répartition géographique</div>
+            <div class="card-sub">Groupée par le segment final du champ localisation.</div>
+          </div>
+        </div>
+        <div class="chart" id="chartLocation"></div>
+      </div>
+
+      <div class="card span-large">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Followers vs dépôts</div>
+            <div class="card-sub">Identifier les profils à fort impact et les valeurs aberrantes.</div>
+          </div>
+        </div>
+        <div class="chart" id="chartFollowersRepos"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Fraîcheur d'activité</div>
+            <div class="card-sub">Profils groupés par âge de la dernière activité.</div>
+          </div>
+        </div>
+        <div class="chart" id="chartActivityFreshness"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Exhaustivité des données</div>
+            <div class="card-sub">Couverture des champs de profil importants.</div>
+          </div>
+        </div>
+        <div class="chart" id="chartDataCompleteness"></div>
+      </div>
+
+      <div class="card span-large">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Débit ETL</div>
+            <div class="card-sub">Enregistrements extraits, transformés et chargés par exécution récente.</div>
+          </div>
+        </div>
+        <div class="chart" id="chartEtlThroughput"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Profils</div>
+        <div class="section-sub">Développeurs à inspecter rapidement depuis les données collectées.</div>
+      </div>
+      <a class="link-muted" href="{{ url_for('pages.search') }}">Ouvrir la recherche</a>
+    </div>
+    <div class="dashboard-lists">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Top développeurs</div>
+            <div class="card-sub">Classés par nombre de followers.</div>
+          </div>
+        </div>
+        <div class="list" id="topDevsList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Profils les plus actifs</div>
+            <div class="card-sub">Basé sur la dernière activité et le nombre de dépôts.</div>
+          </div>
+        </div>
+        <div class="list" id="mostActiveList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Profils récemment collectés</div>
+            <div class="card-sub">Derniers profils ajoutés ou actualisés par l'ETL.</div>
+          </div>
+        </div>
+        <div class="list" id="recentProfilesList"></div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__PAGE__ = "dashboard";
+</script>
+{% endblock %}

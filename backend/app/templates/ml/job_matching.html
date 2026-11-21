@@ -1,0 +1,81 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Matching d'offres - DevScope{% endblock %}
+{% block header %}Matching d'offres{% endblock %}
+
+{% block content %}
+<div class="page-layout">
+  <section class="page-section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Formulaire de matching</div>
+        <div class="section-sub">Définir les critères de poste pour recommander les profils les plus pertinents.</div>
+      </div>
+    </div>
+    <div class="card">
+      <form class="form ml-form" method="post">
+        <label class="field">
+          <span class="label">Intitulé du poste</span>
+          <input class="input" name="title" />
+        </label>
+        <label class="field">
+          <span class="label">Technologies requises</span>
+          <input class="input" name="technologies" placeholder="Python, React, PostgreSQL" />
+        </label>
+        <label class="field">
+          <span class="label">Compétences requises</span>
+          <input class="input" name="skills" placeholder="API, ETL, data analytics" />
+        </label>
+        <label class="field">
+          <span class="label">Niveau d'expérience</span>
+          <select class="input" name="experience">
+            <option value="junior">Junior</option>
+            <option value="mid" selected>Mid</option>
+            <option value="senior">Senior</option>
+          </select>
+        </label>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Recommander</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  {% if results %}
+    <section class="page-section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Résultats</div>
+          <div class="section-sub">Profils classés par score de matching.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Rang</th>
+                <th>Nom d'utilisateur</th>
+                <th>Score</th>
+                <th>Correspondance compétences</th>
+                <th>Score ML</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in results %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td>{{ r.username }}</td>
+                  <td>{{ r.score }}</td>
+                  <td>{{ r.skill_match }}</td>
+                  <td>{{ r.ml_score }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

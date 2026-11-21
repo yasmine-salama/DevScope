@@ -1,0 +1,157 @@
+﻿{% extends 'layout/base.html' %}
+
+{% block title %}Comparer les profils - DevScope{% endblock %}
+{% block header %}Comparaison de profils{% endblock %}
+
+{% block content %}
+<div class="page-layout">
+  <section class="page-section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Comparer les profils sélectionnés</div>
+        <div class="section-sub">Analyser followers, dépôts, contributions et compétences détectées.</div>
+      </div>
+      {% if comparing %}
+        <a class="btn btn-ghost" href="{{ url_for('ml.compare') }}">Retour à la sélection</a>
+      {% endif %}
+    </div>
+
+    {% if comparing %}
+      {% if developers %}
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="eyebrow">Vue comparative</div>
+              <div class="card-title">Profils comparés</div>
+              <div class="card-sub">Métriques principales des profils retenus.</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Nom d'utilisateur</th>
+                  <th>Followers</th>
+                  <th>Dépôts</th>
+                  <th>Contributions (1 an)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for d in developers %}
+                  <tr>
+                    <td>{{ d.username }}</td>
+                    <td>{{ d.followers_count }}</td>
+                    <td>{{ d.repos_count }}</td>
+                    <td>{{ d.contributions_last_year }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="comparison-summary">
+          {% for d in developers %}
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <div class="card-title">{{ d.username }}</div>
+                  <div class="card-sub">
+                    {% set top = 'followers' %}
+                    {% set top_val = d.followers_count %}
+                    {% if d.repos_count > top_val %}{% set top = 'repos' %}{% set top_val = d.repos_count %}{% endif %}
+                    {% if d.contributions_last_year > top_val %}{% set top = 'contributions' %}{% set top_val = d.contributions_last_year %}{% endif %}
+                    Meilleure métrique : {{ top }} ({{ top_val }})
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="chart-grid">
+          <div class="card chart" id="barChart"></div>
+          <div class="card chart" id="radarChart"></div>
+          <div class="card chart" id="skillBarChart"></div>
+          <div class="card chart chart-tall" id="skillHeatmap"></div>
+        </div>
+      {% else %}
+        <div class="empty">Aucun profil trouvé pour les identifiants fournis.</div>
+      {% endif %}
+    {% else %}
+      {% if developers %}
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="eyebrow">Sélection</div>
+              <div class="card-title">Profils disponibles</div>
+              <div class="card-sub">Sélectionnez au moins deux profils à comparer.</div>
+            </div>
+          </div>
+          <form method="post">
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Nom d'utilisateur</th>
+                    <th>Followers</th>
+                    <th>Dépôts</th>
+                    <th>Contributions (1 an)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for d in developers %}
+                    <tr>
+                      <td><input type="checkbox" name="ids" value="{{ d.id }}" /></td>
+                      <td>{{ d.username }}</td>
+                      <td>{{ d.followers_count }}</td>
+                      <td>{{ d.repos_count }}</td>
+                      <td>{{ d.contributions_last_year }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit">Comparer la sélection</button>
+            </div>
+          </form>
+        </div>
+      {% else %}
+        <div class="empty">Aucun profil disponible.</div>
+      {% endif %}
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {% if bar_chart %}
+    <script>
+      const bar = {{ bar_chart | safe }};
+      plotChart('barChart', bar);
+    </script>
+  {% endif %}
+
+  {% if radar_chart %}
+    <script>
+      const radar = {{ radar_chart | safe }};
+      plotChart('radarChart', radar);
+    </script>
+  {% endif %}
+  {% if skill_bar_chart %}
+    <script>
+      const skillBar = {{ skill_bar_chart | safe }};
+      plotChart('skillBarChart', skillBar);
+    </script>
+  {% endif %}
+
+  {% if skill_heatmap %}
+    <script>
+      const skillHeat = {{ skill_heatmap | safe }};
+      plotChart('skillHeatmap', skillHeat);
+    </script>
+  {% endif %}
+{% endblock %}
+

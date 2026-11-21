@@ -1,0 +1,31 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Connexion · DevScope{% endblock %}
+{% block header %}Connexion{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-title">Bienvenue</div>
+    <div class="auth-sub">Connectez-vous pour accéder à vos tableaux de bord et profils enregistrés.</div>
+
+    <form class="form" method="post" action="{{ url_for('auth.login_post') }}">
+      <label class="field">
+        <span class="label">Email</span>
+        <input class="input" name="email" type="email" required autocomplete="email" />
+      </label>
+      <label class="field">
+        <span class="label">Mot de passe</span>
+        <input class="input" name="password" type="password" required autocomplete="current-password" />
+      </label>
+      <button class="btn btn-primary btn-full" type="submit">Se connecter</button>
+    </form>
+
+    <div class="auth-footer">
+      <span class="muted">Vous n'avez pas de compte ?</span>
+      <a class="link" href="{{ url_for('auth.register') }}">Créez-en un</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

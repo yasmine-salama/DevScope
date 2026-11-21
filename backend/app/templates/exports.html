@@ -1,0 +1,44 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Exportations · DevScope{% endblock %}
+{% block header %}Exportations{% endblock %}
+
+{% block content %}
+<div class="page-layout">
+  <section class="page-section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Centre d'exportation</div>
+        <div class="section-sub">Télécharger les données analytiques ou ouvrir un rapport spécifique à un profil.</div>
+      </div>
+    </div>
+    <div class="export-grid">
+      <div class="card export-card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Analyses du tableau de bord</div>
+            <div class="card-sub">Technologies principales et données de synthèse pour les rapports.</div>
+          </div>
+        </div>
+        <div class="export-actions">
+          <a class="btn btn-primary" href="/api/exports/dashboard?format=csv">Télécharger CSV</a>
+          <a class="btn btn-ghost" href="/api/exports/dashboard?format=pdf">Télécharger PDF</a>
+        </div>
+      </div>
+
+      <div class="card export-card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Rapport développeur</div>
+            <div class="card-sub">Ouvrez un profil développeur pour exporter en CSV ou PDF.</div>
+          </div>
+        </div>
+        <div class="export-actions">
+          <a class="btn btn-primary" href="{{ url_for('pages.search') }}">Aller à la recherche</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+

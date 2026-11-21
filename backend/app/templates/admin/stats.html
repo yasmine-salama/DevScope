@@ -1,0 +1,57 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Administration · Statistiques · DevScope{% endblock %}
+{% block header %}Administration · Statistiques{% endblock %}
+
+{% block content %}
+<div class="grid gap-16">
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Statistiques</div>
+        <div class="card-sub">Indicateurs administratifs rapides et classements.</div>
+      </div>
+      <div class="row gap-8">
+        <a class="btn btn-ghost" href="{{ url_for('admin.dashboard') }}">Retour</a>
+        <a class="btn btn-ghost" href="{{ url_for('pages.exports') }}">Exportations</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Technologies principales</div>
+        <div class="card-sub">Classées par score de compétence agrégé.</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Technologie</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tech, score in top_tech %}
+            <tr>
+              <td>{{ tech }}</td>
+              <td>{{ score }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="2" class="muted">Aucune donnée.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__PAGE__ = "admin_stats";
+</script>
+{% endblock %}
+

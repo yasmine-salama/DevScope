@@ -1,0 +1,187 @@
+﻿{% extends 'layout/base.html' %}
+
+{% block title %}Matching d'offres - DevScope{% endblock %}
+{% block header %}Matching d'offres{% endblock %}
+
+{% block content %}
+<div class="page-layout">
+  <section class="page-section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Recommandation de profils</div>
+        <div class="section-sub">Comparer les exigences d'une offre avec les compétences et signaux d'activité disponibles.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="eyebrow">Modèle de matching</div>
+          <div class="card-title">Critères de poste</div>
+          <div class="card-sub">Renseignez les technologies, compétences et niveau visé.</div>
+        </div>
+      </div>
+      <form class="form ml-form" method="post">
+        <label class="field">
+          <span class="label">Intitulé du poste</span>
+          <input class="input" name="title" value="{{ form.title if form else '' }}" />
+        </label>
+        <label class="field">
+          <span class="label">Technologies requises</span>
+          <input class="input" name="technologies" value="{{ form.technologies if form else '' }}" placeholder="Python, Flask, PostgreSQL" />
+        </label>
+        <label class="field">
+          <span class="label">Compétences requises</span>
+          <input class="input" name="skills" value="{{ form.skills if form else '' }}" placeholder="API, ETL, dashboard" />
+        </label>
+        <label class="field">
+          <span class="label">Niveau d'expérience</span>
+          <select class="input" name="experience">
+            <option value="junior" {% if form and form.experience == 'junior' %}selected{% endif %}>Junior</option>
+            <option value="mid" {% if not form or form.experience == 'mid' %}selected{% endif %}>Mid</option>
+            <option value="senior" {% if form and form.experience == 'senior' %}selected{% endif %}>Senior</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="label">Nombre de résultats</span>
+          <input class="input" type="number" name="top_n" min="1" value="{{ form.top_n if form else 50 }}" />
+        </label>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Recommander</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  {% if db_results %}
+    <section class="page-section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Résultats - Base de données</div>
+          <div class="section-sub">Profils locaux classés par score de pertinence.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Rang</th>
+                <th>Nom d'utilisateur</th>
+                <th>Score final</th>
+                <th>Compétences</th>
+                <th>Correspondances / manques</th>
+                <th>Expérience</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in db_results %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td>
+                    {% if r.profile_url %}
+                      <a class="link" href="{{ r.profile_url }}" target="_blank" rel="noreferrer">{{ r.username }}</a>
+                    {% else %}
+                      <a class="link" href="{{ url_for('pages.developer_details', developer_id=r.id) }}">{{ r.username }}</a>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="progress"><div class="progress-bar" style="width:{{ (r.final_score * 100) | round(1) }}%"></div></div>
+                    <div class="muted small">{{ (r.final_score * 100) | round(1) }}%</div>
+                  </td>
+                  <td>
+                    <div class="progress"><div class="progress-bar" style="width:{{ (r.skill_match * 100) | round(1) }}%"></div></div>
+                    <div class="muted small">{{ (r.skill_match * 100) | round(1) }}%</div>
+                  </td>
+                  <td>
+                    <div class="skill-line">
+                      {% for s in r.matched_skills %}
+                        <span class="badge good">{{ s }}</span>
+                      {% endfor %}
+                    </div>
+                    <div class="skill-line">
+                      {% for s in r.missing_skills %}
+                        <span class="badge bad">{{ s }}</span>
+                      {% endfor %}
+                    </div>
+                    <details>
+                      <summary class="muted small">Pourquoi recommandé</summary>
+                      <div class="muted small">Compétences {{ (r.skill_match * 100) | round(1) }}% - Expérience {{ (r.experience_match * 100) | round(1) }}%</div>
+                    </details>
+                  </td>
+                  <td>{{ (r.experience_match * 100) | round(1) }}%</td>
+                  <td><a class="btn btn-ghost" href="{{ url_for('pages.developer_details', developer_id=r.id) }}">Voir profil</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  {% if live_results %}
+    <section class="page-section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Résultats - GitHub live</div>
+          <div class="section-sub">Profils publics évalués depuis la recherche GitHub.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Rang</th>
+                <th>Nom d'utilisateur</th>
+                <th>Score final</th>
+                <th>Compétences</th>
+                <th>Correspondances / manques</th>
+                <th>Expérience</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in live_results %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td><a class="link" href="{{ r.profile_url }}" target="_blank" rel="noreferrer">{{ r.username }}</a></td>
+                  <td>
+                    <div class="progress"><div class="progress-bar" style="width:{{ (r.final_score * 100) | round(1) }}%"></div></div>
+                    <div class="muted small">{{ (r.final_score * 100) | round(1) }}%</div>
+                  </td>
+                  <td>
+                    <div class="progress"><div class="progress-bar" style="width:{{ (r.skill_match * 100) | round(1) }}%"></div></div>
+                    <div class="muted small">{{ (r.skill_match * 100) | round(1) }}%</div>
+                  </td>
+                  <td>
+                    <div class="skill-line">
+                      {% for s in r.matched_skills %}
+                        <span class="badge good">{{ s }}</span>
+                      {% endfor %}
+                    </div>
+                    <div class="skill-line">
+                      {% for s in r.missing_skills %}
+                        <span class="badge bad">{{ s }}</span>
+                      {% endfor %}
+                    </div>
+                    <details>
+                      <summary class="muted small">Pourquoi recommandé</summary>
+                      <div class="muted small">Compétences {{ (r.skill_match * 100) | round(1) }}% - Expérience {{ (r.experience_match * 100) | round(1) }}%</div>
+                    </details>
+                  </td>
+                  <td>{{ (r.experience_match * 100) | round(1) }}%</td>
+                  <td><a class="btn btn-ghost" href="{{ r.profile_url }}" target="_blank" rel="noreferrer">Voir profil</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}
+

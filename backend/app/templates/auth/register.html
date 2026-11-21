@@ -1,0 +1,35 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Inscription · DevScope{% endblock %}
+{% block header %}Inscription{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-title">Créez votre compte</div>
+    <div class="auth-sub">Un espace simple pour l'analyse des développeurs.</div>
+
+    <form class="form" method="post" action="{{ url_for('auth.register_post') }}">
+      <label class="field">
+        <span class="label">Email</span>
+        <input class="input" name="email" type="email" required autocomplete="email" />
+      </label>
+      <label class="field">
+        <span class="label">Mot de passe</span>
+        <input class="input" name="password" type="password" required autocomplete="new-password" />
+      </label>
+      <label class="field">
+        <span class="label">Confirmer le mot de passe</span>
+        <input class="input" name="confirm_password" type="password" required autocomplete="new-password" />
+      </label>
+      <button class="btn btn-primary btn-full" type="submit">Créer un compte</button>
+    </form>
+
+    <div class="auth-footer">
+      <span class="muted">Vous avez déjà un compte ?</span>
+      <a class="link" href="{{ url_for('auth.login') }}">Se connecter</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

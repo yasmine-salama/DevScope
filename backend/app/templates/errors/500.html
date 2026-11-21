@@ -1,0 +1,17 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Erreur serveur · DevScope{% endblock %}
+{% block header %}Erreur serveur{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-head">
+    <div>
+      <div class="card-title">500 — Une erreur s'est produite</div>
+      <div class="card-sub">Essayez d'actualiser la page. Si le problème persiste, vérifiez la requête ETL et la connexion à la base de données.</div>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('pages.dashboard') }}">Retour au tableau de bord</a>
+  </div>
+</div>
+{% endblock %}
+

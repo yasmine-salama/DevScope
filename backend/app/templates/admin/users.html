@@ -1,0 +1,50 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Administration · Utilisateurs · DevScope{% endblock %}
+{% block header %}Administration · Utilisateurs{% endblock %}
+
+{% block content %}
+<div class="grid gap-16">
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Utilisateurs</div>
+        <div class="card-sub">Comptes enregistrés et accès admin.</div>
+      </div>
+      <a class="btn btn-ghost" href="{{ url_for('admin.dashboard') }}">Retour</a>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Admin</th>
+              <th>Créé</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+              <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ "oui" if u.is_admin else "non" }}</td>
+                <td>{{ u.created_at }}</td>
+              </tr>
+            {% else %}
+            <tr><td colspan="4" class="muted">Aucun utilisateur.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__PAGE__ = "admin_users";
+</script>
+{% endblock %}
+
+

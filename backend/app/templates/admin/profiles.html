@@ -1,0 +1,58 @@
+﻿{% extends "layout/base.html" %}
+
+{% block title %}Administration · Profils · DevScope{% endblock %}
+{% block header %}Administration · Profils{% endblock %}
+
+{% block content %}
+<div class="grid gap-16">
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Profils collectés</div>
+        <div class="card-sub">Derniers {{ profiles|length }} profils (triés par date de mise à jour).</div>
+      </div>
+      <a class="btn btn-ghost" href="{{ url_for('admin.dashboard') }}">Retour</a>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nom d'utilisateur</th>
+              <th>Plateforme</th>
+              <th>Localisation</th>
+              <th>Followers</th>
+              <th>Dépôts</th>
+              <th>Dernière activité</th>
+              <th>Mis à jour</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for d in profiles %}
+            <tr>
+              <td>{{ d.id }}</td>
+              <td><a class="link" href="{{ url_for('pages.developer_details', developer_id=d.id) }}">{{ d.username }}</a></td>
+              <td>{{ d.platform }}</td>
+              <td>{{ d.location or "—" }}</td>
+              <td>{{ d.followers_count }}</td>
+              <td>{{ d.repos_count }}</td>
+              <td>{{ d.last_activity_at or "—" }}</td>
+              <td>{{ d.updated_at }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="muted">Aucun profil.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__PAGE__ = "admin_profiles";
+</script>
+{% endblock %}
+
+

@@ -1,0 +1,46 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Comparer les profils - DevScope{% endblock %}
+{% block header %}Comparaison de profils{% endblock %}
+
+{% block content %}
+<div class="page-layout">
+  <section class="page-section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Comparer les profils sélectionnés</div>
+        <div class="section-sub">Synthèse des principales métriques développeur.</div>
+      </div>
+    </div>
+
+    {% if developers %}
+      <div class="card">
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nom d'utilisateur</th>
+                <th>Followers</th>
+                <th>Dépôts</th>
+                <th>Contributions (1 an)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for d in developers %}
+                <tr>
+                  <td>{{ d.username }}</td>
+                  <td>{{ d.followers_count }}</td>
+                  <td>{{ d.repos_count }}</td>
+                  <td>{{ d.contributions_last_year }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% else %}
+      <div class="empty">Aucun profil sélectionné. Utiliser <code>?ids=1,2,3</code> pour comparer.</div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
